@@ -1,86 +1,105 @@
-// ========== 地图初始化 ==========
-let map, boatMarker, trail = [];
+// ======== 韶关学院（韶乐园校区）坐标 ========
+const SHAOGUAN_YUELUAN = {
+    lat: 24.77298,// 纬度
+    lng: 113.67162// 经度
+};
 
+let map, boatMarker, infoWindow;
+
+// ======== 初始化地图 ========
 function initMap() {
-    map = L.map('map').setView([22.5, 114.2], 15);
+    map = new AMap.Map('map', {
+        center: [SHAOGUAN_YUELUAN.lng, SHAOGUAN_YUELUAN.lat],
+        zoom: 16,
+        viewMode: '2D',
+        mapStyle: 'amap://styles/normal', // 标准彩色地图
+        features: ['bg', 'point', 'road', 'building']
+    });
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap'
-    }).addTo(map);
+    // 添加控件
+    AMap.plugin(['AMap.Scale', 'AMap.ToolBar'], () => {
+        map.addControl(new AMap.Scale());
+        map.addControl(new AMap.ToolBar({ liteStyle: true }));
+    });
 
-    boatMarker = L.marker([22.5, 114.2], { title: "AquaDrone" }).addTo(map);
-    trail = [[22.5, 114.2]];
-    window.boatLine = L.polyline(trail, { color: '#00bfa5', opacity: 0.7 }).addTo(map);
+    // 创建无人船标记
+    boatMarker = new AMap.Marker({
+        position: new AMap.LngLat(SHAOGUAN_YUELUAN.lng, SHAOGUAN_YUELUAN.lat),
+        map: map,
+        // ✅ 推荐使用高德官方图标 或 国内 CDN
+        icon: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_b.png',
+        offset: new AMap.Pixel(-16, -16),
+        title: 'AquaDrone',
+        zIndex: 100
+    });
+
+    // 信息窗体
+    infoWindow = new AMap.InfoWindow({
+        content: `
+            <div style="font-size:14px;line-height:1.6;background:#0f172a;color:#e2e8f0;padding:12px;border-radius:8px;">
+                <strong style="color:#0ea5e9;">🚤 AquaDrone 无人船</strong><br>
+                📍 位置：韶关学院（韶乐园校区）<br>
+                ✅ 状态：正常运行<br>
+                🔋 电池：87%<br>
+                🌊 高度：水面航行
+            </div>
+        `,
+        offset: new AMap.Pixel(0, -30)
+    });
+
+    // 点击反馈
+    boatMarker.on('click', () => {
+        infoWindow.open(map, boatMarker.getPosition());
+        // 轻微震动反馈（现代浏览器支持）
+        if (navigator.vibrate) navigator.vibrate(50);
+    });
+
+    // 默认打开
+    setTimeout(() => infoWindow.open(map, boatMarker.getPosition()), 1000);
 }
 
-// ========== 实时数据更新 ==========
-async function fetchRealTimeData() {
-    try {
-        const res = await fetch('/api/data');
-        const data = await res.json();
-
-        document.getElementById('temp').textContent = data.temperature + '°C';
-        document.getElementById('ph').textContent = data.ph;
-        document.getElementById('oxygen').textContent = data.oxygen + ' mg/L';
-        document.getElementById('density').textContent = data.density + '%';
-
-        const lat = data.latitude + (Math.random() - 0.5) * 0.0005;
-        const lng = data.longitude + (Math.random() - 0.5) * 0.0005;
-        boatMarker.setLatLng([lat, lng]);
-        trail.push([lat, lng]);
-        if (trail.length > 10) trail.shift();
-        window.boatLine.setLatLngs(trail);
-
-        // 更新系统状态
-        document.getElementById('battery').textContent = '87%';
-        document.getElementById('signal').textContent = '强';
-        document.getElementById('status').textContent = '正常运行';
-        document.getElementById('last-update').textContent = new Date().toLocaleTimeString();
-
-    } catch (err) {
-        console.log("使用模拟数据");
-        document.getElementById('temp').textContent = (24 + Math.random() * 6).toFixed(1) + '°C';
-        document.getElementById('ph').textContent = (7.0 + (Math.random() - 0.5)).toFixed(1);
-        document.getElementById('oxygen').textContent = (5.5 + Math.random() * 2).toFixed(1) + ' mg/L';
-        document.getElementById('density').textContent = Math.floor(80 + Math.random() * 20) + '%';
-        document.getElementById('battery').textContent = '85%';
-        document.getElementById('signal').textContent = '中';
-        document.getElementById('status').textContent = '运行中';
-        document.getElementById('last-update').textContent = new Date().toLocaleTimeString();
-    }
+// ======== 模拟传感器数据 ========
+function updateSensors() {
+    document.getElementById('temp').textContent = (24.5 + Math.random() * 3).toFixed(1) + '°C';
+    document.getElementById('ph').textContent = (7.2 + (Math.random() - 0.5)).toFixed(1);
+    document.getElementById('oxygen').textContent = (6.0 + Math.random() * 1.5).toFixed(1) + ' mg/L';
+    document.getElementById('density').textContent = Math.floor(75 + Math.random() * 25) + '%';
 }
 
-// ========== 摄像头功能 ==========
+// ======== 摄像头功能 ========
 document.getElementById('startCamera').addEventListener('click', async () => {
     const video = document.getElementById('video');
+    const btn = document.getElementById('startCamera');
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-            video: true,
-            audio: false
-        });
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         video.srcObject = stream;
-        document.getElementById('startCamera').textContent = '📹 摄像头已开启';
-        document.getElementById('startCamera').disabled = true;
+        btn.textContent = '📹 摄像头已开启';
+        btn.disabled = true;
+        // 模拟AI识别
+        setTimeout(() => alert('🔍 AI检测到鱼群活动区域！'), 2000);
     } catch (err) {
-        alert('无法访问摄像头：' + err.message);
+        alert('摄像头访问失败：' + err.message);
     }
 });
 
-// ========== 投喂按钮 ==========
+// ======== 投喂功能 ========
 document.getElementById('feedButton').addEventListener('click', () => {
     const btn = document.getElementById('feedButton');
     btn.textContent = '🚀 投喂中...';
     btn.disabled = true;
+    // 模拟投喂动画
+    boatMarker.setAnimation('AMAP_ANIMATION_BOUNCE');
     setTimeout(() => {
-        alert('✅ 投喂完成！已投放 200g 饲料');
+        boatMarker.setAnimation(null);
+        alert('✅ 投喂完成！已投放 200g 高营养饲料');
         btn.textContent = '🚀 启动自动投喂';
         btn.disabled = false;
-    }, 2000);
+    }, 2500);
 });
 
-// ========== 初始化 ==========
-window.onload = function () {
+// ======== 页面加载 ========
+window.onload = () => {
     initMap();
-    fetchRealTimeData();
-    setInterval(fetchRealTimeData, 3000);
+    updateSensors();
+    setInterval(updateSensors, 3000);
 };

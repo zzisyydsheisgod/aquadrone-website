@@ -1,106 +1,239 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AquaDrone - 智能无人船系统</title>
-    <link rel="stylesheet" href="css/style.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- 高德地图 API -->
+    <script
+        src="https://webapi.amap.com/maps?v=1.4.15&key=a6a6701051bad914f09e5c027402fcac&plugin=AMap.Scale,AMap.ToolBar"></script>
+
+    <!-- Google Fonts: Space Grotesk -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* ===== 全局暗黑风 ===== */
+        :root {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --primary: #0ea5e9;
+            --success: #10b981;
+            --text: #e2e8f0;
+            --border: #334155;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --glow: 0 0 15px rgba(14, 165, 233, 0.4);
+        }
+
+        body {
+            font-family: 'Space Grotesk', 'Arial', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(14, 165, 233, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 20%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            border-radius: 16px;
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.2em;
+            font-weight: 700;
+            background: linear-gradient(90deg, #0ea5e9, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: var(--glow);
+        }
+
+        p.subtitle {
+            margin: 10px 0 0;
+            color: #94a3b8;
+            font-weight: 300;
+        }
+
+        /* ===== 数据卡片 ===== */
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .data-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+        }
+
+        .data-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--glow), var(--shadow);
+            border-color: #0ea5e9;
+        }
+
+        .data-card h3 {
+            margin: 0 0 8px;
+            color: #94a3b8;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .data-card span {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: white;
+        }
+
+        /* ===== 地图容器 ===== */
+        #map {
+            width: 100%;
+            height: 550px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin: 20px 0;
+        }
+
+        /* ===== 按钮组 ===== */
+        .button-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        button {
+            padding: 14px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, var(--primary), #0284c7);
+            color: white;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button#feedButton {
+            background: linear-gradient(135deg, var(--success), #059669);
+        }
+
+        button[disabled] {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* ===== 视频区域 ===== */
+        #video {
+            width: 100%;
+            height: 300px;
+            border-radius: 12px;
+            background: #0f172a;
+            object-fit: cover;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border);
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .data-grid {
+                grid-template-columns: 1fr;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-    <header>
-        <h1>🌊 AquaDrone</h1>
-        <p>智能无人船 · 鱼群追踪与自动投喂系统</p>
-    </header>
+    <div class="container">
+        <header>
+            <h1>🌊 AquaDrone</h1>
+            <p class="subtitle">智能无人船 · 实时监控 · 韶关学院（韶乐园校区）</p>
+        </header>
 
-    <nav>
-        <a href="#home">首页</a>
-        <a href="#demo">实时监控</a>
-        <a href="#camera">实时影像</a>
-        <a href="admin.html">管理后台</a>
-    </nav>
-
-    <!-- 首页 -->
-    <div class="container" id="home">
-        <section class="card">
-            <h2>智能无人船系统介绍</h2>
-            <p>AquaDrone 是一款基于 AI 与物联网技术的全自动无人船，专为水产养殖设计。通过声呐与视觉识别技术实时追踪鱼群位置，并根据鱼类密度、水温、时间自动投放适量饲料。</p>
-            <img src="https://source.unsplash.com/random/600x400/?drone,boat,fish" alt="无人船" class="boat-img">
-        </section>
-    </div>
-
-    <!-- 实时监控 -->
-    <div class="container" id="demo">
-        <section class="card">
-            <h2>📊 实时数据监控</h2>
-            <div class="data-panel">
-                <div class="data-card">
-                    <h3>水温</h3>
-                    <p id="temp">--</p>
-                </div>
-                <div class="data-card">
-                    <h3>pH值</h3>
-                    <p id="ph">--</p>
-                </div>
-                <div class="data-card">
-                    <h3>溶氧量</h3>
-                    <p id="oxygen">--</p>
-                </div>
-                <div class="data-card">
-                    <h3>鱼群密度</h3>
-                    <p id="density">--</p>
-                </div>
+        <!-- 实时数据卡片 -->
+        <div class="data-grid">
+            <div class="data-card">
+                <h3>🌡️ 水温</h3>
+                <span id="temp">--</span>
             </div>
-
-            <h2>📍 实时位置追踪</h2>
-            <div id="map" style="height: 300px; border-radius: 10px;"></div>
-
-            <button class="feed-btn" id="feedButton">🚀 启动自动投喂</button>
-        </section>
-
-        <section class="card">
-            <h2>🔋 系统状态</h2>
-            <div class="status-panel">
-                <div class="status-item">
-                    <span>⚡ 电池电量</span>
-                    <span id="battery">--</span>
-                </div>
-                <div class="status-item">
-                    <span>📡 信号强度</span>
-                    <span id="signal">--</span>
-                </div>
-                <div class="status-item">
-                    <span>🔄 运行状态</span>
-                    <span id="status">--</span>
-                </div>
-                <div class="status-item">
-                    <span>🕓 最后更新</span>
-                    <span id="last-update">--</span>
-                </div>
+            <div class="data-card">
+                <h3>🧪 pH值</h3>
+                <span id="ph">--</span>
             </div>
-        </section>
+            <div class="data-card">
+                <h3>🫧 溶氧量</h3>
+                <span id="oxygen">--</span>
+            </div>
+            <div class="data-card">
+                <h3>🐟 鱼群密度</h3>
+                <span id="density">--</span>
+            </div>
+        </div>
+
+        <!-- 按钮 -->
+        <div class="button-group">
+            <button id="feedButton">🚀 启动自动投喂</button>
+            <button id="startCamera">📷 开启摄像头</button>
+        </div>
+
+        <!-- 摄像头视频 -->
+        <video id="video" autoplay muted></video>
+
+        <!-- 地图 -->
+        <div id="map"></div>
     </div>
 
-    <!-- 实时影像 -->
-    <div class="container" id="camera">
-        <section class="card">
-            <h2>📹 实时影像（模拟）</h2>
-            <p>点击下方按钮开启摄像头，模拟无人船水下摄像头画面</p>
-            <button id="startCamera" class="camera-btn">📷 开启摄像头</button>
-            <video id="video" autoplay muted playsinline
-                style="width:100%; height:auto; border-radius:10px; margin-top:1rem;"></video>
-        </section>
-    </div>
-
-    <footer>
-        <p>&copy; 2025 AquaDrone 团队 | 智慧渔业解决方案</p>
-    </footer>
-
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- 引入 JS -->
     <script src="js/main.js"></script>
+
 </body>
 
 </html>
