@@ -4,236 +4,71 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AquaDrone - 智能无人船系统</title>
-
-    <!-- 高德地图 API -->
+    <title>AquaDrone - 智能无人船监控</title>
     <script
         src="https://webapi.amap.com/maps?v=1.4.15&key=a6a6701051bad914f09e5c027402fcac&plugin=AMap.Scale,AMap.ToolBar"></script>
-
-    <!-- Google Fonts: Space Grotesk -->
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
-
-    <style>
-        /* ===== 全局暗黑风 ===== */
-        :root {
-            --bg: #0f172a;
-            --card-bg: #1e293b;
-            --primary: #0ea5e9;
-            --success: #10b981;
-            --text: #e2e8f0;
-            --border: #334155;
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            --glow: 0 0 15px rgba(14, 165, 233, 0.4);
-        }
-
-        body {
-            font-family: 'Space Grotesk', 'Arial', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            background-image:
-                radial-gradient(circle at 10% 20%, rgba(14, 165, 233, 0.05) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 20%);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        header {
-            text-align: center;
-            margin: 30px 0;
-            padding: 20px;
-            border-radius: 16px;
-            background: rgba(30, 41, 59, 0.6);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-        }
-
-        h1 {
-            margin: 0;
-            font-size: 2.2em;
-            font-weight: 700;
-            background: linear-gradient(90deg, #0ea5e9, #10b981);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: var(--glow);
-        }
-
-        p.subtitle {
-            margin: 10px 0 0;
-            color: #94a3b8;
-            font-weight: 300;
-        }
-
-        /* ===== 数据卡片 ===== */
-        .data-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin: 20px 0;
-        }
-
-        .data-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            box-shadow: var(--shadow);
-            backdrop-filter: blur(8px);
-            transition: all 0.3s ease;
-        }
-
-        .data-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--glow), var(--shadow);
-            border-color: #0ea5e9;
-        }
-
-        .data-card h3 {
-            margin: 0 0 8px;
-            color: #94a3b8;
-            font-size: 0.9em;
-            font-weight: 500;
-        }
-
-        .data-card span {
-            font-size: 1.4em;
-            font-weight: 600;
-            color: white;
-        }
-
-        /* ===== 地图容器 ===== */
-        #map {
-            width: 100%;
-            height: 550px;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            margin: 20px 0;
-        }
-
-        /* ===== 按钮组 ===== */
-        .button-group {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin: 20px 0;
-        }
-
-        button {
-            padding: 14px 24px;
-            font-size: 16px;
-            font-weight: 600;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: linear-gradient(135deg, var(--primary), #0284c7);
-            color: white;
-            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.4);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        button#feedButton {
-            background: linear-gradient(135deg, var(--success), #059669);
-        }
-
-        button[disabled] {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        /* ===== 视频区域 ===== */
-        #video {
-            width: 100%;
-            height: 300px;
-            border-radius: 12px;
-            background: #0f172a;
-            object-fit: cover;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border);
-        }
-
-        /* ===== 响应式 ===== */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 1.8em;
-            }
-
-            .data-grid {
-                grid-template-columns: 1fr;
-            }
-
-            button {
-                width: 100%;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/flv.js@1.6.2/dist/flv.min.js"></script>
 </head>
 
 <body>
+    <!-- ========== 内容容器（加遮罩层） ========== -->
+    <div class="content-wrapper">
 
-    <div class="container">
-        <header>
-            <h1>🌊 AquaDrone</h1>
-            <p class="subtitle">智能无人船 · 实时监控 · 韶关学院（韶乐园校区）</p>
-        </header>
 
-        <!-- 实时数据卡片 -->
-        <div class="data-grid">
-            <div class="data-card">
-                <h3>🌡️ 水温</h3>
-                <span id="temp">--</span>
-            </div>
-            <div class="data-card">
-                <h3>🧪 pH值</h3>
-                <span id="ph">--</span>
-            </div>
-            <div class="data-card">
-                <h3>🫧 溶氧量</h3>
-                <span id="oxygen">--</span>
-            </div>
-            <div class="data-card">
-                <h3>🐟 鱼群密度</h3>
-                <span id="density">--</span>
-            </div>
+
+
+        <!-- 头部 -->
+        <div class="header">
+            <h1>🚤 AquaDrone</h1>
+            <p class="subtitle">智能无人船 · 韶关学院附近水域测试</p>
         </div>
-
-        <!-- 按钮 -->
-        <div class="button-group">
-            <button id="feedButton">🚀 启动自动投喂</button>
-            <button id="startCamera">📷 开启摄像头</button>
-        </div>
-
-        <!-- 摄像头视频 -->
-        <video id="video" autoplay muted></video>
 
         <!-- 地图 -->
         <div id="map"></div>
-    </div>
 
-    <!-- 引入 JS -->
+        <!-- 摄像头 -->
+        <div class="camera-panel">
+            <h3>📹 实时摄像头</h3>
+            <video id="camera-video" controls autoplay muted></video>
+            <p><small>水下视角 · 1080P · 自动播放</small></p>
+        </div>
+
+        <!-- 数据面板 -->
+        <div class="sensor-panel">
+            <h3>📊 实时数据</h3>
+            <p>水温：<span id="temp">--</span>°C</p>
+            <p>溶氧：<span id="oxygen">--</span>mg/L</p>
+            <p>PH值：<span id="ph">--</span></p>
+            <p>坐标：<span id="coord">未定位</span></p>
+        </div>
+
+        <!-- 控制按钮 -->
+        <div class="control-panel">
+            <button class="control-btn" onclick="startCruise()">自动巡航</button>
+            <button class="control-btn" onclick="feedFish()">自动投喂</button>
+            <button class="control-btn" onclick="takePhoto()">拍照</button>
+        </div>
+
+        <!-- 二维码按钮 -->
+        <button id="qrcode-btn" title="扫码分享">📱</button>
+
+        <!-- 二维码弹窗 -->
+        <div id="qrcode-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>📱 扫码查看监控</h3>
+                <p>使用手机浏览器扫描二维码</p>
+                <div id="qrcode"></div>
+                <small>https://aquadrone.pages.dev</small>
+            </div>
+        </div>
+
+    </div> <!-- end .content-wrapper -->
+
     <script src="js/main.js"></script>
-
 </body>
 
 </html>

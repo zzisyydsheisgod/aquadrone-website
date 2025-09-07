@@ -1,198 +1,273 @@
-* {
+/* ============ 全局背景图设置 ============ */
+body {
+    background: url('G:/项目/aquadrone/public/images/background.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+    font-family: 'Space Grotesk', sans-serif;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Arial, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
 }
 
-body {
-    background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
-    color: #333;
-    line-height: 1.6;
-}
-
-header {
-    background: #006064;
-    color: white;
-    padding: 2rem 1rem;
-    text-align: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-header h1 {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-nav {
-    background: #004d40;
-    padding: 1rem;
-    text-align: center;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-nav a {
-    color: #80deea;
-    margin: 0 1rem;
-    text-decoration: none;
-    font-weight: bold;
-    transition: all 0.3s;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-}
-
-nav a:hover,
-nav a.active {
-    background: #00838f;
-    color: white;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-}
-
-.card {
-    background: white;
-    border-radius: 16px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
-    backdrop-filter: blur(10px);
-}
-
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
-}
-
-h2 {
-    color: #006064;
-    margin-bottom: 1rem;
-    border-bottom: 3px solid #80deea;
-    padding-bottom: 0.5rem;
+/* 内容遮罩层 */
+.content-wrapper {
     position: relative;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.3);
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
-h2::after {
-    content: '';
-    position: absolute;
-    bottom: -3px;
+/* ============ 鱼类动画 ============ */
+.fish-background {
+    position: fixed;
+    top: 0;
     left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.fish {
+    position: absolute;
     width: 60px;
-    height: 3px;
-    background: #00bfa5;
+    height: auto;
+    opacity: 0.8;
+    animation: swim 25s infinite linear;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
-.data-panel {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 1rem;
-    margin: 1.5rem 0;
+.fish-clown {
+    width: 50px;
+    top: 15%;
+    animation-delay: 0s;
 }
 
-.data-card {
-    background: linear-gradient(135deg, #b2dfdb, #80cbc4);
-    padding: 1.2rem;
-    border-radius: 12px;
+.fish-goldfish {
+    width: 60px;
+    top: 50%;
+    animation-delay: 8s;
+}
+
+.fish-shark {
+    width: 70px;
+    top: 80%;
+    animation-delay: 15s;
+}
+
+@keyframes swim {
+    0% {
+        left: -100px;
+        transform: translateX(0) scaleX(1);
+    }
+
+    49% {
+        transform: scaleX(1);
+    }
+
+    50% {
+        transform: scaleX(-1);
+    }
+
+    51% {
+        transform: scaleX(1);
+    }
+
+    100% {
+        left: 105vw;
+        transform: translateX(0) scaleX(1);
+    }
+}
+
+/* ============ 头部样式 ============ */
+.header {
     text-align: center;
-    min-width: 140px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s;
+    padding: 20px;
+    z-index: 10;
 }
 
-.data-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+.header h1 {
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #00bfa5;
+    letter-spacing: 1px;
 }
 
-.data-card h3 {
-    font-size: 1.2rem;
-    color: #004d40;
+.subtitle {
+    margin: 8px 0 0;
+    font-size: 1rem;
+    opacity: 0.8;
 }
 
-.data-card p {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #00695c;
-}
-
+/* ============ 地图 ============ */
 #map {
-    background: #ddd;
-    border: 1px solid #ccc;
+    width: 90%;
+    height: 70vh;
+    border-radius: 16px;
+    margin: 20px auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.feed-btn,
-.camera-btn {
-    display: block;
-    width: 220px;
-    margin: 2rem auto;
-    padding: 1rem;
+/* ============ 摄像头 ============ */
+.camera-panel {
+    margin: 20px auto;
+    width: 90%;
+    max-width: 800px;
+    background: rgba(10, 36, 99, 0.4);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 20px;
+    color: white;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+#camera-video {
+    width: 100%;
+    height: 400px;
+    background: #000;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+/* ============ 传感器面板 ============ */
+.sensor-panel {
+    position: fixed;
+    bottom: 120px;
+    right: 20px;
+    width: 280px;
+    background: rgba(10, 36, 99, 0.4);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 20px;
+    color: white;
+    z-index: 100;
+    font-weight: 500;
+}
+
+/* ============ 控制按钮 ============ */
+.control-panel {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 12px;
+    z-index: 100;
+}
+
+.control-btn {
     background: #00bfa5;
     color: white;
     border: none;
-    border-radius: 50px;
-    font-size: 1.2rem;
+    padding: 14px 28px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(0, 191, 165, 0.4);
+}
+
+.control-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0, 191, 165, 0.6);
+    background: #00d8b6;
+}
+
+/* ============ 二维码按钮 ============ */
+#qrcode-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 50px;
+    height: 50px;
+    background: rgba(0, 191, 165, 0.9);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 191, 165, 0.4);
+    z-index: 1000;
+    transition: all 0.3s;
+}
+
+#qrcode-btn:hover {
+    transform: scale(1.1);
+    background: #00d8b6;
+}
+
+/* ============ 二维码弹窗 ============ */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1001;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.modal-content {
+    background: white;
+    margin: 15% auto;
+    padding: 20px;
+    width: 300px;
+    border-radius: 12px;
+    text-align: center;
+    color: #333;
+}
+
+.close {
+    float: right;
+    font-size: 28px;
     font-weight: bold;
     cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 0 4px 10px rgba(0, 191, 165, 0.3);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-.feed-btn:hover,
-.camera-btn:hover {
-    background: #00897b;
-    transform: scale(1.08);
+.close:hover {
+    color: #00bfa5;
 }
 
-.status-panel {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    background: #e0f7fa;
-    padding: 1rem;
-    border-radius: 8px;
-    margin: 1rem 0;
+#qrcode {
+    margin: 15px auto;
+    width: 200px;
+    height: 200px;
 }
 
-.status-item {
-    display: flex;
-    justify-content: space-between;
-    font-size: 1.1rem;
+#qrcode img {
+    width: 100%;
+    height: 100%;
+    border: 1px solid #eee;
 }
 
-.status-item span:first-child {
-    font-weight: bold;
-    color: #006064;
-}
-
-#video {
-    border: 2px solid #00bfa5;
-    box-shadow: 0 4px 12px rgba(0, 191, 165, 0.2);
-}
-
-footer {
-    text-align: center;
-    padding: 2rem;
-    background: #004d40;
-    color: #80deea;
-    margin-top: 2rem;
-    font-size: 0.9rem;
-}
-
+/* ============ 响应式 ============ */
 @media (max-width: 768px) {
-    header h1 {
-        font-size: 2rem;
+
+    #map,
+    .camera-panel {
+        width: 95%;
+        height: 60vh;
     }
 
-    .data-panel {
-        grid-template-columns: 1fr;
+    .sensor-panel,
+    .control-panel {
+        right: 10px;
+        font-size: 14px;
+    }
+
+    .control-btn {
+        padding: 12px 20px;
+    }
+
+    .header h1 {
+        font-size: 2rem;
     }
 }

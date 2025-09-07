@@ -1,105 +1,125 @@
-// ======== 韶关学院（韶乐园校区）坐标 ========
-const SHAOGUAN_YUELUAN = {
-    lat: 24.77298,// 纬度
-    lng: 113.67162// 经度
+// ============ 无人船位置定义 ============
+// 当前测试区域：韶关学院附近水域
+const BOAT_AREA = {
+    lat: 24.77298,
+    lng: 113.67162
 };
 
-let map, boatMarker, infoWindow;
+// 全局变量
+let map, boatMarker;
 
-// ======== 初始化地图 ========
+// ============ 初始化地图 ============
 function initMap() {
+    // 创建高德地图实例
     map = new AMap.Map('map', {
-        center: [SHAOGUAN_YUELUAN.lng, SHAOGUAN_YUELUAN.lat],
-        zoom: 16,
-        viewMode: '2D',
-        mapStyle: 'amap://styles/normal', // 标准彩色地图
-        features: ['bg', 'point', 'road', 'building']
+        center: [BOAT_AREA.lng, BOAT_AREA.lat], // 中心点
+        zoom: 15,                              // 缩放等级
+        viewMode: '2D',                        // 2D 视图
+        mapStyle: 'amap://styles/light',       // 浅色地图风格
+        features: ['bg', 'point', 'road', 'building'] // 显示元素
     });
 
-    // 添加控件
-    AMap.plugin(['AMap.Scale', 'AMap.ToolBar'], () => {
-        map.addControl(new AMap.Scale());
-        map.addControl(new AMap.ToolBar({ liteStyle: true }));
-    });
+    // 添加比例尺和工具栏控件
+    map.addControl(new AMap.Scale());
+    map.addControl(new AMap.ToolBar());
 
     // 创建无人船标记
     boatMarker = new AMap.Marker({
-        position: new AMap.LngLat(SHAOGUAN_YUELUAN.lng, SHAOGUAN_YUELUAN.lat),
+        position: new AMap.LngLat(BOAT_AREA.lng, BOAT_AREA.lat),
         map: map,
-        // ✅ 推荐使用高德官方图标 或 国内 CDN
-        icon: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_b.png',
-        offset: new AMap.Pixel(-16, -16),
-        title: 'AquaDrone',
-        zIndex: 100
+        icon: 'https://img.icons8.com/ios-filled/50/00bfa5/boat.png', // 小船图标
+        offset: new AMap.Pixel(-15, -30), // 图标偏移
+        title: '无人船当前位置'
     });
 
-    // 信息窗体
-    infoWindow = new AMap.InfoWindow({
-        content: `
-            <div style="font-size:14px;line-height:1.6;background:#0f172a;color:#e2e8f0;padding:12px;border-radius:8px;">
-                <strong style="color:#0ea5e9;">🚤 AquaDrone 无人船</strong><br>
-                📍 位置：韶关学院（韶乐园校区）<br>
-                ✅ 状态：正常运行<br>
-                🔋 电池：87%<br>
-                🌊 高度：水面航行
-            </div>
-        `,
-        offset: new AMap.Pixel(0, -30)
-    });
-
-    // 点击反馈
-    boatMarker.on('click', () => {
-        infoWindow.open(map, boatMarker.getPosition());
-        // 轻微震动反馈（现代浏览器支持）
-        if (navigator.vibrate) navigator.vibrate(50);
-    });
-
-    // 默认打开
-    setTimeout(() => infoWindow.open(map, boatMarker.getPosition()), 1000);
+    // 模拟传感器数据
+    document.getElementById('coord').textContent = `${BOAT_AREA.lng.toFixed(5)}, ${BOAT_AREA.lat.toFixed(5)}`;
+    document.getElementById('temp').textContent = '25.3';
+    document.getElementById('oxygen').textContent = '6.8';
+    document.getElementById('ph').textContent = '7.2';
 }
 
-// ======== 模拟传感器数据 ========
-function updateSensors() {
-    document.getElementById('temp').textContent = (24.5 + Math.random() * 3).toFixed(1) + '°C';
-    document.getElementById('ph').textContent = (7.2 + (Math.random() - 0.5)).toFixed(1);
-    document.getElementById('oxygen').textContent = (6.0 + Math.random() * 1.5).toFixed(1) + ' mg/L';
-    document.getElementById('density').textContent = Math.floor(75 + Math.random() * 25) + '%';
-}
+// ============ 摄像头播放功能 ============
+function initCamera() {
+    const videoElement = document.getElementById('camera-video');
 
-// ======== 摄像头功能 ========
-document.getElementById('startCamera').addEventListener('click', async () => {
-    const video = document.getElementById('video');
-    const btn = document.getElementById('startCamera');
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        video.srcObject = stream;
-        btn.textContent = '📹 摄像头已开启';
-        btn.disabled = true;
-        // 模拟AI识别
-        setTimeout(() => alert('🔍 AI检测到鱼群活动区域！'), 2000);
-    } catch (err) {
-        alert('摄像头访问失败：' + err.message);
+    // ⚠️ 请替换为你的实际 FLV 流地址
+    // 示例：rtmp://your-server/live/boat → 转为 http://your-server/live/boat.flv
+    const flvUrl = 'https://your-flv-server.com/live/boat.flv'; // ← 修改为你的地址
+
+    if (flvjs.isSupported()) {
+        const flvPlayer = flvjs.createPlayer({
+            type: 'flv',
+            url: flvUrl
+        });
+        flvPlayer.attachMediaElement(videoElement);
+        flvPlayer.load();
+        flvPlayer.play().catch(e => {
+            console.error('摄像头播放失败:', e);
+            videoElement.src = 'https://via.placeholder.com/800x400?text=摄像头未连接';
+        });
+    } else {
+        videoElement.src = 'https://via.placeholder.com/800x400?text=浏览器不支持FLV播放';
     }
-});
+}
 
-// ======== 投喂功能 ========
-document.getElementById('feedButton').addEventListener('click', () => {
-    const btn = document.getElementById('feedButton');
-    btn.textContent = '🚀 投喂中...';
-    btn.disabled = true;
-    // 模拟投喂动画
-    boatMarker.setAnimation('AMAP_ANIMATION_BOUNCE');
-    setTimeout(() => {
-        boatMarker.setAnimation(null);
-        alert('✅ 投喂完成！已投放 200g 高营养饲料');
-        btn.textContent = '🚀 启动自动投喂';
-        btn.disabled = false;
-    }, 2500);
-});
+// ============ 二维码功能 ============
+let qrcodeModal = document.getElementById('qrcode-modal');
+let qrcodeBtn = document.getElementById('qrcode-btn');
+let closeBtn = document.querySelector('.close');
 
-// ======== 页面加载 ========
-window.onload = () => {
-    initMap();
-    updateSensors();
-    setInterval(updateSensors, 3000);
+// 显示二维码弹窗
+qrcodeBtn.onclick = function () {
+    qrcodeModal.style.display = "block";
+    if (!window.qrGenerated) {
+        generateQRCode();
+        window.qrGenerated = true;
+    }
+};
+
+// 关闭弹窗
+closeBtn.onclick = function () {
+    qrcodeModal.style.display = "none";
+};
+
+// 点击背景关闭
+window.onclick = function (event) {
+    if (event.target == qrcodeModal) {
+        qrcodeModal.style.display = "none";
+    }
+};
+
+// 生成二维码（使用 qrcode.js）
+function generateQRCode() {
+    let script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/qrcode.js/lib/qrcode.min.js';
+    script.onload = function () {
+        new QRCode(document.getElementById("qrcode"), {
+            text: "https://aquadrone.pages.dev", // ← 替换为你的真实部署地址
+            width: 200,
+            height: 200,
+            colorDark: "#00bfa5",
+            colorLight: "#ffffff"
+        });
+    };
+    document.head.appendChild(script);
+}
+
+// ============ 控制按钮功能（模拟） ============
+function startCruise() {
+    alert('🚀 自动巡航已启动！');
+}
+
+function feedFish() {
+    alert('🍚 自动投喂中...');
+}
+
+function takePhoto() {
+    alert('📸 拍照成功！图像已上传云端');
+}
+
+// ============ 页面加载完成后初始化 ============
+window.onload = function () {
+    initMap();     // 初始化地图
+    initCamera();  // 初始化摄像头
 };
