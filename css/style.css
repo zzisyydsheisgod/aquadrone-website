@@ -1,6 +1,6 @@
 /* ============ 全局背景图设置 ============ */
 body {
-    background: url('G:/项目/aquadrone/public/images/background.jpg') no-repeat center center fixed;
+    background: url('/public/images/background.jpg') no-repeat center center fixed;
     background-size: cover;
     color: white;
     font-family: 'Space Grotesk', sans-serif;
