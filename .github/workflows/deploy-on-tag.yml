@@ -1,0 +1,16 @@
+name: Deploy to Vercel on Tag
+
+on:
+  push:
+    tags:
+      - 'v*'  # 只在推送以 v 开头的标签时触发，如 v1.0, v2.1
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Vercel Deployment
+        run: |
+          curl -X POST "$VERCEL_HOOK_URL"
+        env:
+          VERCEL_HOOK_URL: ${{ secrets.VERCEL_HOOK_URL }}
